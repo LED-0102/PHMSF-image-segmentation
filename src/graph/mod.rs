@@ -1,4 +1,4 @@
-mod graph;
-mod image;
-mod kruskal;
-mod dsu;
+pub mod graph;
+pub(crate) mod image;
+pub mod kruskal;
+pub mod dsu;
