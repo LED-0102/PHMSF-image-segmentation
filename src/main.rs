@@ -5,9 +5,9 @@ use graph::image::load_graph_from_image;
 use crate::graph::kruskal::Kruskal;
 
 fn main() {
-    let image_path = "static/4.1.05.tiff"; // Replace with your image path
-    let threshold = 10f32;
-    let contrast = 10000f32;
+    let image_path = "static/4.1.07.tiff"; // Replace with your image path
+    let threshold = 13f32;
+    let contrast = 3f32;
 
     match load_graph_from_image(image_path) {
         Ok(graph) => {
