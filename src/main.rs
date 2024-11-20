@@ -30,6 +30,7 @@ fn main() {
                     img1.put_pixel(y, x, Rgb([255 - r, 255 - g, 255 - b]));
                 }
             }
+            img1.save("segmented_image_serial.png").expect("Failed to save the image");
             let elapsed_time = start_time.elapsed();
             println!("Time taken for sequential algorithm: {:?}", elapsed_time);
             println!("Sequential algorithm applied successfully.");
