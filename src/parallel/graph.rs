@@ -43,12 +43,12 @@ impl Graph {
             };
             num_tiles
         ];
-        let mut dsu = DisjointSetUnion::new(width*height, threshold, contrast);
+        let dsu = DisjointSetUnion::new(width*height, threshold, contrast);
         let mut v = vec![];
         for _ in 0..num_tiles {
             v.push(RwLock::new(HashMap::new()));
         }
-        let mut regions = Arc::new(v);
+        let regions = Arc::new(v);
         Graph {
             tiles,
             width,
@@ -72,14 +72,6 @@ impl Graph {
     pub fn add_region(&mut self, tile_idx: usize, region: usize) {
         self.regions[tile_idx].write().unwrap().insert(region, false);
     }
-
-    pub fn set_region(&mut self, tile_idx: usize, region: usize) {
-        self.regions[tile_idx].write().unwrap().insert(region, true);
-    }
-
-    pub fn erase_region (&mut self, tile_idx: usize, region: usize) {
-        self.regions[tile_idx].write().unwrap().remove(&region);
-    }
 }
 
 pub fn load_graph_from_image_with_tiles(
@@ -99,7 +91,6 @@ pub fn load_graph_from_image_with_tiles(
             let x = ux as usize;
             let y = uy as usize;
 
-            // Determine which tile this pixel belongs to
             let tile_x = x / tile_height;
             let tile_y = y / tile_width;
             let tile_idx = tile_x * (width as usize / tile_width) + tile_y;
@@ -131,16 +122,13 @@ pub fn load_graph_from_image_with_tiles(
                         + (pixel1[2] as f32 - pixel2[2] as f32).powi(2);
                     weight = weight.sqrt();
 
-                    // Check if the neighbour is in the same tile
                     let neighbour_tile_x = nx as usize / tile_height;
                     let neighbour_tile_y = ny as usize / tile_width;
                     let neighbour_tile_idx = neighbour_tile_x * (width as usize / tile_width) + neighbour_tile_y;
 
                     if tile_idx == neighbour_tile_idx {
-                        // Internal edge
                         graph.add_edge(tile_idx, node1, node2, weight);
                     } else {
-                        // Border edge between tiles
                         graph.add_border_edge(tile_idx, node1, node2, weight);
                     }
                 }

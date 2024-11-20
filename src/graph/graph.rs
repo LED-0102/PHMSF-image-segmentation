@@ -11,8 +11,8 @@ impl Graph {
         Graph {
             dimensions: (height, width),
             nodes,
-            adj_list: vec![Vec::new(); (nodes) as usize],
-            pixel: vec![vec![(0, 0, 0); (width) as usize]; (height) as usize],
+            adj_list: vec![Vec::new(); nodes as usize],
+            pixel: vec![vec![(0, 0, 0); width as usize]; height as usize],
         }
     }
 

@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::mem::swap;
 use std::sync::{Arc, RwLock};
 

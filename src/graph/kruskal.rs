@@ -20,7 +20,6 @@ impl Kruskal {
                 edges.push((v.1, u, v.0));
             }
         }
-        println!("{} {}", mxu, mxv);
         edges.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
 
         Kruskal {

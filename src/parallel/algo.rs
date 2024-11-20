@@ -37,43 +37,15 @@ impl Algo {
     }
 
     pub fn border_edges_merge(&self, graph: &mut Graph) {
-        let mut ind: Vec<usize> = vec![0; graph.tiles.len()];
-        let mut min_edge: (usize, f32) = (0, f32::MAX);
-
-        'outer: loop {
-            let mut found: bool = false;
-
-            // Iterate through all tiles
-            for i in 0..graph.tiles.len() {
-                // Skip tiles whose index is out of bounds
-                if ind[i] >= graph.tiles[i].border_edges.len() {
-                    continue;
-                }
-
-                found = true;
-
-                // Update the min_edge if a smaller weight edge is found
-                if min_edge.1 > graph.tiles[i].border_edges[ind[i]].weight {
-                    min_edge = (i, graph.tiles[i].border_edges[ind[i]].weight);
-                }
-            }
-
-            // If no valid edges are found, break the loop
-            if !found {
-                break;
-            }
-
-            // Ensure the index is still within bounds before accessing the edge
-            if ind[min_edge.0] < graph.tiles[min_edge.0].border_edges.len() {
-                let edge = &graph.tiles[min_edge.0].border_edges[ind[min_edge.0]];
-
-                let tile1 = get_tile_id(edge.node1 / graph.width, edge.node1 % graph.width, graph.width, graph.tile_width, graph.tile_height);
-                let tile2 = get_tile_id(edge.node2 / graph.width, edge.node2 % graph.width, graph.width, graph.tile_width, graph.tile_height);
-
-                if edge.weight < graph.dsu.threshold {
+        graph.tiles.iter_mut().for_each(|tile| {
+            for (ind, edge) in tile.border_edges.iter().enumerate() {
+                if edge.weight <= graph.dsu.threshold {
                     match graph.dsu.union_threshold(edge.node1, edge.node2, edge.weight) {
                         None => {}
                         Some(node) => {
+                            let tile1 = get_tile_id(edge.node1 / graph.width, edge.node1 % graph.width, graph.width, graph.tile_width, graph.tile_height);
+                            let tile2 = get_tile_id(edge.node2 / graph.width, edge.node2 % graph.width, graph.width, graph.tile_width, graph.tile_height);
+
                             graph.regions[tile1].write().unwrap().remove(&node.1);
                             graph.regions[tile2].write().unwrap().remove(&node.1);
 
@@ -85,15 +57,11 @@ impl Algo {
                         }
                     }
                 } else {
-                    // Update the border index only if the index is valid
-                    break 'outer;
+                    tile.border_index = ind;
+                    break;
                 }
-
-                // Increment the index for the current tile after processing the edge
-
             }
-            ind[min_edge.0] += 1;
-        }
+        })
     }
 
 
@@ -114,7 +82,6 @@ impl Algo {
         let tile_height = graph.tile_height;
 
         graph.tiles.par_iter_mut().for_each(|tile| {
-            // Set tile.border_index as the first index in sorted array border_edges where edge.weight > threshold using binary_search
             tile.border_index = tile.border_edges.binary_search_by(|a| a.weight.partial_cmp(&graph.dsu.threshold).unwrap()).unwrap_or_else(|ind| ind);
             while tile.index < tile.edges.len() && tile.border_index < tile.border_edges.len() {
                 // Use precomputed `width` inside the closure
@@ -203,5 +170,14 @@ impl Algo {
         result_image
     }
 
+    pub fn apply (&self, graph: &mut Graph) -> Vec<Vec<(u8, u8, u8)>> {
+        self.threshold_merge(graph);
+        self.border_edges_merge(graph);
+        let ans = self.relabel(graph);
+        self.compute_credit(graph);
+        self.apply_heuristic(graph);
+        self.delay_queue(graph);
+        ans
+    }
 
 }

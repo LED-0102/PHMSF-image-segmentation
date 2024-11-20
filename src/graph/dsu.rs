@@ -12,9 +12,9 @@ pub struct DisjointSetUnion {
 impl DisjointSetUnion {
     pub(crate) fn new (nodes: usize, threshold: f32, contrast: f32) -> DisjointSetUnion {
         let mut parent: Vec<usize> = vec![0; nodes ];
-        let mut smallest_edge: Vec<f32> = vec![f32::NAN; nodes];
-        let mut size: Vec<i32> = vec![1; nodes];
-        let mut credit: Vec<f32> = vec![f32::NAN; nodes];
+        let smallest_edge: Vec<f32> = vec![f32::NAN; nodes];
+        let size: Vec<i32> = vec![1; nodes];
+        let credit: Vec<f32> = vec![f32::NAN; nodes];
         for i in 0..nodes {
             parent[i]=i;
         }
