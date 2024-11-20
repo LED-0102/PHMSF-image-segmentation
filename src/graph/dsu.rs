@@ -38,7 +38,8 @@ impl DisjointSetUnion {
 
     pub fn credit (&mut self, node: usize, weight: f32) -> f32{
         let par = self.find(node);
-        let min_perimeter: f32 = 4.0 * std::f32::consts::PI * self.size[par] as f32;
+        let mut min_perimeter: f32 = 4.0 * std::f32::consts::PI * self.size[par] as f32;
+        min_perimeter = min_perimeter.sqrt();
         let mut contrast = 0f32;
 
         if self.smallest_edge[node].is_nan() {
